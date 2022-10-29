@@ -172,6 +172,12 @@ CREATE UNIQUE INDEX "SellerProfile_userId_key" ON "SellerProfile"("userId");
 -- CreateIndex
 CREATE UNIQUE INDEX "SellerProfile_companyUsername_key" ON "SellerProfile"("companyUsername");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "TempProduct_productId_key" ON "TempProduct"("productId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "TempOrder_userId_key" ON "TempOrder"("userId");
+
 -- AddForeignKey
 ALTER TABLE "TempUser" ADD CONSTRAINT "TempUser_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
