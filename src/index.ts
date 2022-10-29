@@ -2,6 +2,7 @@ import { config } from 'dotenv';
 config();
 import cors from 'cors';
 import express from 'express';
+import helmet from 'helmet';
 
 import { corsConfig } from './utils/appConfig';
 import { globalErrorHandler, healthCheck } from './utils/routes';
@@ -10,6 +11,7 @@ import orderRouter from './routes/orders';
 import productRouter from './routes/products';
 
 const app = express();
+app.use(helmet());
 app.use(cors(corsConfig()));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
