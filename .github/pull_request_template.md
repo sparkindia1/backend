@@ -1,0 +1,2 @@
+- [ ] My branch is rebased with target branch
+- [ ] I have fully tested this branch locally
