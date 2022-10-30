@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt';
 import { Request, Response } from 'express';
 
 import { issueJWT } from '../../utils/jwt';
+import filterResponse from '../../utils/filterResponse';
 import { prisma } from '../../utils/prisma';
 
 export const login = async (req: Request, res: Response) => {
@@ -21,5 +22,8 @@ export const login = async (req: Request, res: Response) => {
   res.cookie('refreshToken', JSON.stringify(accessToken));
   res.cookie('accessToken', JSON.stringify(refreshToken));
 
-  return res.status(200).json(user);
+  return res.status(200).json({
+    user: filterResponse(user),
+    message: 'Login Successful',
+  });
 };

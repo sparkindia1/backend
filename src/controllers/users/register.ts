@@ -30,7 +30,9 @@ export const verifyAccount = async (req: Request, res: Response) => {
     where: { id: tempUser.id },
   });
 
-  return res.status(200).send();
+  return res.status(200).json({
+    message: 'Account verified',
+  });
 };
 
 export const register = async (req: Request, res: Response) => {
@@ -56,5 +58,7 @@ export const register = async (req: Request, res: Response) => {
   res.cookie('refreshToken', JSON.stringify(accessToken));
   res.cookie('accessToken', JSON.stringify(refreshToken));
 
-  return res.status(200).send();
+  return res.status(200).json({
+    message: 'Registration Successful',
+  });
 };
