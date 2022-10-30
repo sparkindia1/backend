@@ -4,7 +4,7 @@ import { Request, Response } from 'express';
 import { issueJWT } from '../../utils/jwt';
 import { prisma } from '../../utils/prisma';
 
-const login = async (req: Request, res: Response) => {
+export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
   const user = await prisma.user.findUnique({
@@ -23,5 +23,3 @@ const login = async (req: Request, res: Response) => {
 
   return res.status(200).json(user);
 };
-
-export default login;

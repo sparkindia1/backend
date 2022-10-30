@@ -33,25 +33,17 @@ export const verifyAccount = async (req: Request, res: Response) => {
   return res.status(200).send();
 };
 
-const register = async (req: Request, res: Response) => {
+export const register = async (req: Request, res: Response) => {
   const { email, phone, password, role } = req.body;
 
   const user = await prisma.user.findFirst({
-    where: {
-      email,
-      deleted: false,
-    },
+    where: { email, deleted: false },
   });
   if (user) throw new Error('User already exists');
 
   const hash = await bcrypt.hash(password, 12);
   await prisma.user.create({
-    data: {
-      email,
-      phone,
-      role,
-      password: hash,
-    },
+    data: { email, phone, role, password: hash },
   });
 
   const savedUser = await prisma.user.findFirst({
@@ -66,5 +58,3 @@ const register = async (req: Request, res: Response) => {
 
   return res.status(200).send();
 };
-
-export default register;

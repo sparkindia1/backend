@@ -91,10 +91,15 @@ model Category {
 model Product {
   id                        Int           @id @default(autoincrement())
   name                      String
+  levelOneLimit             String?
   pricePerProductLevelOne   Int
+  levelTwoLimit             String?
   pricePerProductLevelTwo   Int
+  levelThreeLimit           String?
   pricePerProductLevelThree Int
+  levelFourLimit            String?
   pricePerProductLevelFour  Int
+  levelFiveLimit            String?
   pricePerProductLevelFive  Int
   owner                     Int // relatio to seller ID
   description               String
