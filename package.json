@@ -2,16 +2,19 @@
   "name": "backend",
   "version": "0.0.0",
   "private": true,
+  "homepage": "https://sparkindia1.github.io/backend",
   "scripts": {
     "start": "ts-node src/index.ts",
     "ci": "yarn install --production",
-    "build": "tsc",
+    "build": "tsc --project tsconfig.prod.json",
     "format:check": "prettier --check .",
     "format:write": "prettier --write .",
     "lint:check": "eslint .",
     "lint:fix": "eslint --fix .",
     "prepare": "husky install",
-    "precommit": "lint-staged"
+    "precommit": "lint-staged",
+    "predeploy": "yarn build",   
+    "deploy": "gh-pages -d build"
   },
   "dependencies": {
     "@prisma/client": "^4.5.0",
@@ -36,6 +39,7 @@
     "@typescript-eslint/eslint-plugin": "^5.41.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-prettier": "^4.2.1",
+    "gh-pages": "^4.0.0",
     "husky": "^8.0.1",
     "lint-staged": "^13.0.3",
     "prettier": "^2.7.1",
