@@ -1,0 +1,17 @@
+"use strict";
+exports.__esModule = true;
+var express_1 = require("express");
+var orders_1 = require("../controllers/orders");
+var routes_1 = require("../utils/routes");
+var orderRouter = (0, express_1.Router)();
+orderRouter.get('/', (0, routes_1.makeSafe)(orders_1.getAllOrders));
+orderRouter.post('/create', (0, routes_1.makeSafe)(orders_1.createOrder));
+orderRouter.get('/mine', (0, routes_1.makeSafe)(orders_1.getMyOrders));
+orderRouter.get('/id', (0, routes_1.makeSafe)(orders_1.getOrderById));
+orderRouter.post('/update/id', (0, routes_1.makeSafe)(orders_1.updateOrder));
+orderRouter.post('/delete/init', (0, routes_1.makeSafe)(orders_1.initDeleteOrder));
+orderRouter.post('/delete/confirm', (0, routes_1.makeSafe)(orders_1.confirmDeleteOrder));
+orderRouter.post('/delete/cancel', (0, routes_1.makeSafe)(orders_1.cancelDeleteOrder));
+orderRouter.get('/status', (0, routes_1.makeSafe)(orders_1.getOrderStatus));
+orderRouter.post('/update/status', (0, routes_1.makeSafe)(orders_1.updateOrderStatus));
+exports["default"] = orderRouter;

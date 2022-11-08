@@ -1,0 +1,17 @@
+"use strict";
+exports.__esModule = true;
+var express_1 = require("express");
+var login_1 = require("../controllers/users/login");
+var register_1 = require("../controllers/users/register");
+var getUser_1 = require("../controllers/users/getUser");
+var routes_1 = require("../utils/routes");
+var users_1 = require("../validators/users");
+var forgot_password_1 = require("../controllers/users/forgot-password");
+var userRouter = (0, express_1.Router)();
+userRouter.post('/user', users_1.validateGetuser, (0, routes_1.makeSafe)(getUser_1.getUser));
+userRouter.post('/login', users_1.validateLogin, (0, routes_1.makeSafe)(login_1.login));
+userRouter.post('/register/create-account', users_1.validateRegister, (0, routes_1.makeSafe)(register_1.register));
+userRouter.post('/register/verify-account', users_1.validateVerifyAccount, (0, routes_1.makeSafe)(register_1.verifyAccount));
+userRouter.post('/forgot-password', users_1.validateForgotPassword, (0, routes_1.makeSafe)(forgot_password_1.forgotPassword));
+userRouter.post('/reset-password', users_1.validateResetPassword, (0, routes_1.makeSafe)(forgot_password_1.resetPassword));
+exports["default"] = userRouter;
