@@ -14,7 +14,7 @@
     "prepare": "husky install",
     "precommit": "lint-staged",
     "predeploy": "yarn build",
-    "deploy": "gh-pages -d build"
+    "deploy": "gh-pages -d build -b build"
   },
   "dependencies": {
     "@prisma/client": "^4.5.0",
