@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import { prisma } from '../../utils/prisma';
 
 export const getOrderById = async (req: Request, res: Response) => {
-  const { id } = req.params;
+  const { id } = req.body;
   const order = await prisma.order.findUnique({
     where: { id: Number(id) },
   });
@@ -16,12 +16,11 @@ export const getOrderById = async (req: Request, res: Response) => {
 };
 
 export const getMyOrders = async (req: Request, res: Response) => {
-  const { userId } = req.params;
+  const { userId } = req.body;
   const orders = await prisma.order.findMany({
     where: { userId: Number(userId) },
   });
 
-  if (!orders) throw new Error('Orders not found');
   return res.status(200).json({
     orders,
     message: 'Orders updated successfully',
@@ -29,14 +28,13 @@ export const getMyOrders = async (req: Request, res: Response) => {
 };
 
 export const getAllOrders = async (req: Request, res: Response) => {
-  const { userId, status } = req.params;
+  const { userId, status } = req.body;
   const orders = await prisma.order.findMany({
-    where: { userId: Number(userId), status },
+    where: { userId: Number(userId), status: status as any },
   });
 
-  if (!orders) throw new Error('Orders not found');
   return res.status(200).json({
     orders,
-    message: 'Orders updated successfully',
+    message: 'Orders fetched successfully',
   });
 };

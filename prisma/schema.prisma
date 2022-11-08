@@ -13,23 +13,34 @@ enum Role {
   SELLER
 }
 
+enum Status {
+  CREATED
+  RECEIVED
+  PACKED
+  IN_TRANSIT
+  DELIVERED
+  CANCELLED
+}
+
 // requires phone or email for buyer and both for seller
 model User {
-  id            Int             @id @default(autoincrement())
-  phone         String          @unique @db.VarChar(15)
-  password      String
-  email         String          @unique
-  role          Role            @default(BUYER)
-  deleted       Boolean         @default(false)
-  verified      Boolean         @default(false)
-  updatedAt     DateTime        @updatedAt
-  UserWarnings  UserWarnings[]
-  buyerProfile  buyerProfile[]
-  SellerProfile SellerProfile[]
-  TempUser      TempUser?
-  Review        Review[]
-  Order         Order[]
-  TempOrder     TempOrder[]
+  id              Int            @id @default(autoincrement())
+  phone           String         @unique @db.VarChar(15)
+  password        String
+  email           String         @unique
+  role            Role           @default(BUYER)
+  deleted         Boolean        @default(false)
+  verified        Boolean        @default(false)
+  updatedAt       DateTime       @updatedAt
+  buyerProfileId  Int?
+  buyerProfile    BuyerProfile?  @relation(fields: [buyerProfileId], references: [id])
+  sellerProfileId Int?
+  sellerProfile   SellerProfile? @relation(fields: [sellerProfileId], references: [id])
+  tempUser        TempUser?
+  reviews         Review[]
+  orders          Order[]
+  tempOrders      TempOrder[]
+  warnings        UserWarnings[]
 }
 
 model TempUser {
@@ -48,16 +59,15 @@ model UserWarnings {
   updatedAt DateTime @updatedAt
 }
 
-model buyerProfile {
-  id     Int  @id @default(autoincrement())
-  userId Int  @unique
-  user   User @relation(fields: [userId], references: [id])
+model BuyerProfile {
+  id     Int    @id @default(autoincrement())
+  userId Int    @unique
+  user   User[]
 }
 
 model SellerProfile {
   id                              Int       @id @default(autoincrement())
   userId                          Int       @unique
-  user                            User      @relation(fields: [userId], references: [id])
   companyName                     String
   companyUsername                 String    @unique
   businessEmail                   String
@@ -66,7 +76,7 @@ model SellerProfile {
   city                            String
   state                           String
   address                         String
-  products                        Int[]
+  productIds                      Int[]
   gstNumber                       String?
   panNumber                       String?
   udyogAadharNumber               String?
@@ -76,7 +86,8 @@ model SellerProfile {
   profileCompletePercentage       Int       @default(0)
   verifiedSeller                  Boolean   @default(false) // true if admin verifies
   updatedAt                       DateTime  @updatedAt
-  Product                         Product[]
+  products                        Product[]
+  user                            User[]
 }
 
 // can be 3 levels deep
@@ -85,7 +96,7 @@ model Category {
   id        Int       @id @default(autoincrement())
   name      String
   updatedAt DateTime  @updatedAt
-  Products  Product[]
+  products  Product[]
 }
 
 model Product {
@@ -101,21 +112,20 @@ model Product {
   pricePerProductLevelFour  Int
   levelFiveLimit            String?
   pricePerProductLevelFive  Int
-  owner                     Int // relatio to seller ID
+  ownerId                   Int // relatio to seller ID
   description               String
   imageUrl                  String[]
   stock                     Int
   categoryId                Int // relation to Category ID
-  category                  Category      @relation(fields: [categoryId], references: [id])
+  categories                Category      @relation(fields: [categoryId], references: [id])
   brandId                   Int // seller Brand 
-  sellerProfile             SellerProfile @relation(fields: [owner], references: [id])
+  sellerProfile             SellerProfile @relation(fields: [ownerId], references: [id])
   verified                  Boolean       @default(false)
   deleted                   Boolean       @default(false)
   trending                  Boolean       @default(false)
-  createdAt                 DateTime      @default(now())
   updatedAt                 DateTime      @updatedAt
-  Review                    Review[]
-  TempProduct               TempProduct[]
+  reviews                   Review[]
+  tempProduct               TempProduct[]
 }
 
 model Review {
@@ -126,7 +136,6 @@ model Review {
   user      User     @relation(fields: [userId], references: [id])
   rating    Int
   comment   String
-  createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
@@ -137,20 +146,11 @@ model TempProduct {
   otp       String
 }
 
-enum Status {
-  CREATED
-  RECEIVED
-  PACKED
-  IN_TRANSIT
-  DELIVERED
-  CANCELLED
-}
-
 model Order {
   id              Int      @id @default(autoincrement())
   userId          Int
   user            User     @relation(fields: [userId], references: [id])
-  products        Int[]
+  productIds      Int[]
   shippingAddress String
   paymentMethod   String
   itemsCharges    Float
@@ -158,7 +158,6 @@ model Order {
   shippingCharges Float
   otherCharges    Float
   status          Status   @default(CREATED)
-  createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }
 

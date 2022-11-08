@@ -14,6 +14,8 @@ CREATE TABLE "User" (
     "deleted" BOOLEAN NOT NULL DEFAULT false,
     "verified" BOOLEAN NOT NULL DEFAULT false,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "buyerProfileId" INTEGER,
+    "sellerProfileId" INTEGER,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
@@ -39,11 +41,11 @@ CREATE TABLE "UserWarnings" (
 );
 
 -- CreateTable
-CREATE TABLE "buyerProfile" (
+CREATE TABLE "BuyerProfile" (
     "id" SERIAL NOT NULL,
     "userId" INTEGER NOT NULL,
 
-    CONSTRAINT "buyerProfile_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "BuyerProfile_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -58,7 +60,7 @@ CREATE TABLE "SellerProfile" (
     "city" TEXT NOT NULL,
     "state" TEXT NOT NULL,
     "address" TEXT NOT NULL,
-    "products" INTEGER[],
+    "productIds" INTEGER[],
     "gstNumber" TEXT,
     "panNumber" TEXT,
     "udyogAadharNumber" TEXT,
@@ -85,12 +87,17 @@ CREATE TABLE "Category" (
 CREATE TABLE "Product" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
+    "levelOneLimit" TEXT,
     "pricePerProductLevelOne" INTEGER NOT NULL,
+    "levelTwoLimit" TEXT,
     "pricePerProductLevelTwo" INTEGER NOT NULL,
+    "levelThreeLimit" TEXT,
     "pricePerProductLevelThree" INTEGER NOT NULL,
+    "levelFourLimit" TEXT,
     "pricePerProductLevelFour" INTEGER NOT NULL,
+    "levelFiveLimit" TEXT,
     "pricePerProductLevelFive" INTEGER NOT NULL,
-    "owner" INTEGER NOT NULL,
+    "ownerId" INTEGER NOT NULL,
     "description" TEXT NOT NULL,
     "imageUrl" TEXT[],
     "stock" INTEGER NOT NULL,
@@ -99,7 +106,6 @@ CREATE TABLE "Product" (
     "verified" BOOLEAN NOT NULL DEFAULT false,
     "deleted" BOOLEAN NOT NULL DEFAULT false,
     "trending" BOOLEAN NOT NULL DEFAULT false,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Product_pkey" PRIMARY KEY ("id")
@@ -112,7 +118,6 @@ CREATE TABLE "Review" (
     "userId" INTEGER NOT NULL,
     "rating" INTEGER NOT NULL,
     "comment" TEXT NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Review_pkey" PRIMARY KEY ("id")
@@ -131,7 +136,7 @@ CREATE TABLE "TempProduct" (
 CREATE TABLE "Order" (
     "id" SERIAL NOT NULL,
     "userId" INTEGER NOT NULL,
-    "products" INTEGER[],
+    "productIds" INTEGER[],
     "shippingAddress" TEXT NOT NULL,
     "paymentMethod" TEXT NOT NULL,
     "itemsCharges" DOUBLE PRECISION NOT NULL,
@@ -139,7 +144,6 @@ CREATE TABLE "Order" (
     "shippingCharges" DOUBLE PRECISION NOT NULL,
     "otherCharges" DOUBLE PRECISION NOT NULL,
     "status" "Status" NOT NULL DEFAULT 'CREATED',
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Order_pkey" PRIMARY KEY ("id")
@@ -164,7 +168,7 @@ CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 CREATE UNIQUE INDEX "TempUser_userId_key" ON "TempUser"("userId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "buyerProfile_userId_key" ON "buyerProfile"("userId");
+CREATE UNIQUE INDEX "BuyerProfile_userId_key" ON "BuyerProfile"("userId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "SellerProfile_userId_key" ON "SellerProfile"("userId");
@@ -179,22 +183,22 @@ CREATE UNIQUE INDEX "TempProduct_productId_key" ON "TempProduct"("productId");
 CREATE UNIQUE INDEX "TempOrder_userId_key" ON "TempOrder"("userId");
 
 -- AddForeignKey
+ALTER TABLE "User" ADD CONSTRAINT "User_buyerProfileId_fkey" FOREIGN KEY ("buyerProfileId") REFERENCES "BuyerProfile"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "User" ADD CONSTRAINT "User_sellerProfileId_fkey" FOREIGN KEY ("sellerProfileId") REFERENCES "SellerProfile"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "TempUser" ADD CONSTRAINT "TempUser_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "UserWarnings" ADD CONSTRAINT "UserWarnings_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "buyerProfile" ADD CONSTRAINT "buyerProfile_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "SellerProfile" ADD CONSTRAINT "SellerProfile_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "Product" ADD CONSTRAINT "Product_categoryId_fkey" FOREIGN KEY ("categoryId") REFERENCES "Category"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Product" ADD CONSTRAINT "Product_owner_fkey" FOREIGN KEY ("owner") REFERENCES "SellerProfile"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Product" ADD CONSTRAINT "Product_ownerId_fkey" FOREIGN KEY ("ownerId") REFERENCES "SellerProfile"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Review" ADD CONSTRAINT "Review_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

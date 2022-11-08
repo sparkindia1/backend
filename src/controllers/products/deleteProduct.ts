@@ -6,7 +6,7 @@ export const initDeleteProduct = async (req: Request, res: Response) => {
   const { productId } = req.body;
 
   const product = await prisma.product.findUnique({
-    where: { id: productId },
+    where: { id: Number(productId) },
   });
   if (!product) throw new Error('Product not found');
 
@@ -25,18 +25,18 @@ export const initDeleteProduct = async (req: Request, res: Response) => {
 export const confirmDeleteProduct = async (req: Request, res: Response) => {
   const { productId, otp } = req.body;
   const tempProduct = await prisma.tempProduct.findUnique({
-    where: { productId },
+    where: { productId: Number(productId) },
   });
   if (!tempProduct) throw new Error('Product not found');
   if (tempProduct.otp !== otp) throw new Error('Invalid OTP');
 
   await prisma.product.update({
-    where: { id: productId },
+    where: { id: Number(productId) },
     data: { deleted: true },
   });
 
   await prisma.tempProduct.delete({
-    where: { productId },
+    where: { productId: Number(productId) },
   });
 
   return res.status(200).json({
@@ -48,14 +48,14 @@ export const cancelDeleteProduct = async (req: Request, res: Response) => {
   const { productId } = req.body;
 
   const tempProduct = await prisma.tempProduct.findUnique({
-    where: { productId },
+    where: { productId: Number(productId) },
   });
 
   if (!tempProduct) throw new Error('Product not found');
   // if(tempProduct.otp !== otp) throw new Error("Invalid OTP");
 
   await prisma.tempProduct.delete({
-    where: { productId },
+    where: { productId: Number(productId) },
   });
 
   return res.status(200).json({

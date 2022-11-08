@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+
 import { prisma } from '../../utils/prisma';
 
 export const createOrder = async (req: Request, res: Response) => {
@@ -21,7 +22,19 @@ export const createOrder = async (req: Request, res: Response) => {
       shippingCharges,
       taxCharges,
       otherCharges,
-      products,
+      productIds: products,
+    },
+    select: {
+      id: true,
+      productIds: true,
+      itemsCharges: true,
+      otherCharges: true,
+      paymentMethod: true,
+      shippingAddress: true,
+      shippingCharges: true,
+      status: true,
+      taxCharges: true,
+      updatedAt: true,
     },
   });
 
