@@ -17,6 +17,7 @@ export const validateLogin = validate(
 
 export const validateRegister = validate(
   z.object({
+    name: z.string(),
     email: z.string().email(),
     phone: z.string().min(6),
     password: z.string().min(6),

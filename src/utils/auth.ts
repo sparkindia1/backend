@@ -1,4 +1,5 @@
 import { Request } from 'express';
+import AppError, { STATUS_CODES } from './errors';
 
 export type RequestWithUser = Request & {
   email?: string;
@@ -7,6 +8,9 @@ export type RequestWithUser = Request & {
 
 export function assertHasUser(req: Request): asserts req is RequestWithUser {
   if (!('email' in req) || !('isAuthenticated' in req)) {
-    throw new Error('Request object without user found unexpectedly');
+    throw new AppError(
+      'Request object without user found unexpectedly',
+      STATUS_CODES.UNAUTHORIZED
+    );
   }
 }

@@ -2,6 +2,7 @@ import { Types } from 'mongoose';
 import { Request, Response } from 'express';
 
 import { OrderModel } from '../../models/order';
+import AppError, { STATUS_CODES } from '../../utils/errors';
 
 export const updateOrder = async (req: Request, res: Response) => {
   const { id } = req.body;
@@ -23,7 +24,7 @@ export const updateOrder = async (req: Request, res: Response) => {
     },
   });
 
-  if (!order) throw new Error('Order not found');
+  if (!order) throw new AppError('Order not found', STATUS_CODES.NOT_FOUND);
   return res.status(200).json({
     order,
     message: 'Order updated successfully',

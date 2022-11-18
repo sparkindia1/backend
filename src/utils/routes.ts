@@ -21,19 +21,7 @@ export const healthCheck = async (_: Request, res: Response) => {
   try {
     return res.status(200).send(healthcheck);
   } catch (error: any) {
-    healthcheck.message = JSON.stringify(error);
+    healthcheck.message = JSON.stringify(error.message || 'An error occured');
     res.status(503).send(healthCheck);
   }
-};
-
-export const globalErrorHandler = (
-  err: any,
-  req: Request,
-  res: Response,
-  _: NextFunction
-) => {
-  console.error(err);
-  return res.status(500).json({
-    message: err.message || 'Internal Server Error',
-  });
 };

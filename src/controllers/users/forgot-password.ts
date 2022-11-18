@@ -2,13 +2,14 @@ import bcrypt from 'bcrypt';
 import { Request, Response } from 'express';
 
 import { UserModel } from '../../models/user';
+import AppError, { STATUS_CODES } from '../../utils/errors';
 import { generateOtp } from '../../utils/helpers';
 
 export const forgotPassword = async (req: Request, res: Response) => {
   const { email } = req.body;
   const otp = generateOtp();
   const user = await UserModel.findOne({ email });
-  if (!user) throw new Error('User not found');
+  if (!user) throw new AppError('User not found', STATUS_CODES.NOT_FOUND);
   await UserModel.findByIdAndUpdate(user._id, {
     $set: { lastOtp: otp },
   });
@@ -24,8 +25,9 @@ export const resetPassword = async (req: Request, res: Response) => {
 
   const user = await UserModel.findById(userId);
 
-  if (!user) throw new Error('User not found');
-  if (user.lastOtp !== otp) throw new Error('Invalid OTP');
+  if (!user) throw new AppError('User not found', STATUS_CODES.NOT_FOUND);
+  if (user.lastOtp !== otp)
+    throw new AppError('Invalid OTP', STATUS_CODES.BAD_REQUEST);
 
   const hashedPassword = await bcrypt.hash(password, 12);
 

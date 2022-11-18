@@ -7,9 +7,10 @@ import cookieSession from 'cookie-session';
 
 import userRouter from './routes/users';
 import orderRouter from './routes/orders';
+import { healthCheck } from './utils/routes';
 import productRouter from './routes/products';
+import { globalErrorHandler } from './utils/errors';
 import { corsConfig, isProduction } from './utils/appConfig';
-import { globalErrorHandler, healthCheck } from './utils/routes';
 
 const app = express();
 
@@ -26,7 +27,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 mongoose.set('debug', !isProduction);
 
-app.all('/health', healthCheck);
+app.get('/health', healthCheck);
 app.use('/user', userRouter);
 app.use('/orders', orderRouter);
 app.use('/products', productRouter);
@@ -36,7 +37,7 @@ app.use('/products', productRouter);
  */
 
 app.use(globalErrorHandler);
-process.on('uncaughtException', (error: Error) => {
+process.on('uncaughtException', (error) => {
   console.error(error);
   process.exit(1);
 });

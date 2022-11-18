@@ -1,6 +1,7 @@
 import JWT from 'jsonwebtoken';
 
 import { PartialUser } from '../models/types';
+import AppError, { STATUS_CODES } from './errors';
 
 const secretKey = process.env.SECRET_KEY!;
 
@@ -31,7 +32,8 @@ export const verifyJWT = (accessToken: string) => {
 export const revalidate = (refreshToken: string, user: PartialUser) => {
   try {
     const decoded = JWT.verify(refreshToken, secretKey);
-    if (!decoded.sub) throw new Error('Invalid token');
+    if (!decoded.sub)
+      throw new AppError('Invalid token', STATUS_CODES.UNAUTHORIZED);
     if ((decoded.sub as JWT.JwtPayload)._id === user._id) return issueJWT(user);
     else return null;
   } catch (err: any) {
