@@ -1,33 +1,23 @@
-import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
+import { Request, Response } from 'express';
 
-import { prisma } from '../../utils/prisma';
 import { issueJWT } from '../../utils/jwt';
+import { UserModel } from '../../models/user';
+import { generateOtp } from '../../utils/helpers';
 
+// Step 2
 export const verifyAccount = async (req: Request, res: Response) => {
   const { email, otp } = req.body;
 
-  const user = await prisma.user.findFirst({
-    where: { email },
-  });
-
+  const user = await UserModel.findOne({ email });
   if (!user) throw new Error('User not found');
 
-  const tempUser = await prisma.tempUser.findFirst({
-    where: { userId: user.id },
-  });
-
-  if (!tempUser) throw new Error('User not found');
-
-  if (tempUser.otp !== otp) throw new Error('Invalid OTP');
-
-  await prisma.user.update({
-    where: { id: user.id },
-    data: { verified: true },
-  });
-
-  await prisma.tempUser.delete({
-    where: { id: tempUser.id },
+  if (user.lastOtp !== otp) throw new Error('Invalid OTP');
+  await UserModel.findByIdAndUpdate(user._id, {
+    $set: {
+      isVerified: true,
+      lastOtp: 0,
+    },
   });
 
   return res.status(200).json({
@@ -35,23 +25,24 @@ export const verifyAccount = async (req: Request, res: Response) => {
   });
 };
 
+// Step 1
 export const register = async (req: Request, res: Response) => {
-  const { email, phone, password, role } = req.body;
+  const { email, name, phone, password, role } = req.body;
 
-  const user = await prisma.user.findFirst({
-    where: { email, deleted: false },
-  });
+  const user = await UserModel.findOne({ email });
   if (user) throw new Error('User already exists');
 
-  const hash = await bcrypt.hash(password, 12);
-  await prisma.user.create({
-    data: { email, phone, role, password: hash },
-  });
+  const otp = generateOtp();
+  // TODO: send to mail
 
-  const savedUser = await prisma.user.findFirst({
-    where: {
-      email,
-    },
+  const hash = await bcrypt.hash(password, 12);
+  const savedUser = await UserModel.create({
+    name,
+    email,
+    phone,
+    role,
+    password: hash,
+    lastOtp: otp,
   });
 
   const { accessToken, refreshToken } = issueJWT(savedUser);

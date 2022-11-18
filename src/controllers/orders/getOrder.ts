@@ -1,13 +1,12 @@
+import { Types } from 'mongoose';
 import { Request, Response } from 'express';
 
-import { prisma } from '../../utils/prisma';
+import { OrderModel } from '../../models/order';
 
 export const getOrderById = async (req: Request, res: Response) => {
   const { id } = req.body;
-  const order = await prisma.order.findUnique({
-    where: { id: Number(id) },
-  });
 
+  const order = await OrderModel.findById(id);
   if (!order) throw new Error('Order not found');
   return res.status(200).json({
     order,
@@ -17,8 +16,8 @@ export const getOrderById = async (req: Request, res: Response) => {
 
 export const getMyOrders = async (req: Request, res: Response) => {
   const { userId } = req.body;
-  const orders = await prisma.order.findMany({
-    where: { userId: Number(userId) },
+  const orders = await OrderModel.find({
+    user: new Types.ObjectId(userId),
   });
 
   return res.status(200).json({
@@ -29,8 +28,8 @@ export const getMyOrders = async (req: Request, res: Response) => {
 
 export const getAllOrders = async (req: Request, res: Response) => {
   const { userId, status } = req.body;
-  const orders = await prisma.order.findMany({
-    where: { userId: Number(userId), status: status as any },
+  const orders = await OrderModel.find({
+    $or: [{ user: new Types.ObjectId(userId) }, { status: status }],
   });
 
   return res.status(200).json({

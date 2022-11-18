@@ -1,14 +1,10 @@
 import { Request, Response } from 'express';
 
-import { prisma } from '../../utils/prisma';
+import { ReviewModel } from '../../models/review';
 
 export const deleteReview = async (req: Request, res: Response) => {
   const { reviewId } = req.body;
-  await prisma.review.delete({
-    where: {
-      id: Number(reviewId),
-    },
-  });
+  await ReviewModel.findByIdAndDelete(reviewId);
   return res.status(200).json({
     message: 'Review deleted successfully',
   });

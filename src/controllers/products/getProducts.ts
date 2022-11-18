@@ -1,12 +1,10 @@
 import { Request, Response } from 'express';
 
-import { prisma } from '../../utils/prisma';
+import { ProductModel } from '../../models/product';
 import filterResponse from '../../utils/filterResponse';
 
 export const getAllProducts = async (req: Request, res: Response) => {
-  const products = await prisma.product.findMany({
-    where: { deleted: false },
-  });
+  const products = await ProductModel.find({ isDeleted: false });
 
   return res.status(200).json({
     products: filterResponse(products),
@@ -16,10 +14,7 @@ export const getAllProducts = async (req: Request, res: Response) => {
 
 export const getSingleProduct = async (req: Request, res: Response) => {
   const { productId } = req.body;
-
-  const product = await prisma.product.findUnique({
-    where: { id: Number(productId) },
-  });
+  const product = await ProductModel.findById(productId);
 
   return res.status(200).json({
     product: filterResponse(product),
@@ -28,14 +23,9 @@ export const getSingleProduct = async (req: Request, res: Response) => {
 };
 
 export const searchProducts = async (req: Request, res: Response) => {
-  // array of categories
   const { category } = req.body;
-  const products = await prisma.product.findMany({
-    where: {
-      categoryId: {
-        in: category,
-      },
-    },
+  const products = await ProductModel.find({
+    categories: { $in: category },
   });
 
   return res.status(200).json({

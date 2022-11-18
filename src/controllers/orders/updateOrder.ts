@@ -1,38 +1,25 @@
+import { Types } from 'mongoose';
 import { Request, Response } from 'express';
 
-import { prisma } from '../../utils/prisma';
+import { OrderModel } from '../../models/order';
 
 export const updateOrder = async (req: Request, res: Response) => {
   const { id } = req.body;
-
-  const order = await prisma.order.update({
-    where: { id: Number(id) },
-    data: {
-      userId: Number(req.body.userId),
-      ...(req.body.itemsCharges && { itemsCharges: req.body.itemsCharges }),
-      ...(req.body.otherCharges && { otherCharges: req.body.otherCharges }),
-      ...(req.body.paymentMethod && { paymentMethod: req.body.paymentMethod }),
-      ...(req.body.products && { products: req.body.products }),
+  const order = await OrderModel.findByIdAndUpdate(id, {
+    $set: {
+      user: new Types.ObjectId(req.body.userId),
       ...(req.body.shippingAddress && {
         shippingAddress: req.body.shippingAddress,
       }),
+      ...(req.body.paymentMethod && { paymentMethod: req.body.paymentMethod }),
+      ...(req.body.itemCharges && { itemCharges: req.body.itemCharges }),
+      ...(req.body.taxCharges && { taxCharges: req.body.taxCharges }),
       ...(req.body.shippingCharges && {
         shippingCharges: req.body.shippingCharges,
       }),
+      ...(req.body.otherCharges && { otherCharges: req.body.otherCharges }),
+      ...(req.body.products && { products: req.body.productIds }),
       ...(req.body.status && { status: req.body.status }),
-      ...(req.body.taxCharges && { taxCharges: req.body.taxCharges }),
-    },
-    select: {
-      id: true,
-      itemsCharges: true,
-      otherCharges: true,
-      paymentMethod: true,
-      productIds: true,
-      shippingAddress: true,
-      shippingCharges: true,
-      status: true,
-      taxCharges: true,
-      updatedAt: true,
     },
   });
 

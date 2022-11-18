@@ -1,19 +1,16 @@
 import bcrypt from 'bcrypt';
 import { Request, Response } from 'express';
 
-import { prisma } from '../../utils/prisma';
+import { UserModel } from '../../models/user';
 import { generateOtp } from '../../utils/helpers';
 
 export const forgotPassword = async (req: Request, res: Response) => {
   const { email } = req.body;
   const otp = generateOtp();
-  const user = await prisma.user.findFirst({
-    where: { email },
-  });
-
+  const user = await UserModel.findOne({ email });
   if (!user) throw new Error('User not found');
-  await prisma.tempUser.create({
-    data: { otp, userId: user.id },
+  await UserModel.findByIdAndUpdate(user._id, {
+    $set: { lastOtp: otp },
   });
 
   console.log({ otp, email, userId: user.id });
@@ -24,22 +21,19 @@ export const forgotPassword = async (req: Request, res: Response) => {
 
 export const resetPassword = async (req: Request, res: Response) => {
   const { userId, otp, password } = req.body;
-  const user = await prisma.tempUser.findFirst({
-    where: { userId },
-  });
+
+  const user = await UserModel.findById(userId);
 
   if (!user) throw new Error('User not found');
-  if (user.otp !== otp) throw new Error('Invalid OTP');
+  if (user.lastOtp !== otp) throw new Error('Invalid OTP');
 
   const hashedPassword = await bcrypt.hash(password, 12);
 
-  await prisma.user.update({
-    where: { id: userId },
-    data: { password: hashedPassword },
-  });
-
-  await prisma.tempUser.delete({
-    where: { id: user.id },
+  await UserModel.findByIdAndUpdate(userId, {
+    $set: {
+      password: hashedPassword,
+      lastOtp: 0,
+    },
   });
 
   return res.status(200).json({

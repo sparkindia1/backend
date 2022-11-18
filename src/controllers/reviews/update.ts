@@ -1,26 +1,13 @@
 import { Request, Response } from 'express';
 
-import { prisma } from '../../utils/prisma';
+import { ReviewModel } from '../../models/review';
 import filterResponse from '../../utils/filterResponse';
 
 export const updateReview = async (req: Request, res: Response) => {
   const { reviewId, rating, comment } = req.body;
-  const review = await prisma.review.update({
-    where: {
-      id: Number(reviewId),
-    },
-    data: {
-      rating,
-      comment,
-    },
-    select: {
-      id: true,
-      userId: true,
-      comment: true,
-      rating: true,
-      productId: true,
-      updatedAt: true,
-    },
+  const review = await ReviewModel.findByIdAndUpdate(reviewId, {
+    rating: rating,
+    comment: comment,
   });
 
   return res.status(200).json({

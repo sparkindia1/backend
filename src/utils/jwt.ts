@@ -1,9 +1,11 @@
 import JWT from 'jsonwebtoken';
 
+import { PartialUser } from '../models/types';
+
 const secretKey = process.env.SECRET_KEY!;
 
-export const issueJWT = (user: any) => {
-  const payload = { sub: user.userID, iat: Date.now() };
+export const issueJWT = (user: PartialUser) => {
+  const payload = { sub: JSON.stringify(user), iat: Date.now() };
   const accessToken = JWT.sign(payload, secretKey, {
     expiresIn: 300 /* 5 minutes */,
   });
@@ -26,10 +28,11 @@ export const verifyJWT = (accessToken: string) => {
   }
 };
 
-export const revalidate = (refreshToken: string, user: any) => {
+export const revalidate = (refreshToken: string, user: PartialUser) => {
   try {
     const decoded = JWT.verify(refreshToken, secretKey);
-    if (decoded.sub === user.userID) return issueJWT(user);
+    if (!decoded.sub) throw new Error('Invalid token');
+    if ((decoded.sub as JWT.JwtPayload)._id === user._id) return issueJWT(user);
     else return null;
   } catch (err: any) {
     return null;

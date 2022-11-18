@@ -1,41 +1,28 @@
 import { Request, Response } from 'express';
 
-import { prisma } from '../../utils/prisma';
+import { Order } from '../../models/types';
+import { OrderModel } from '../../models/order';
 
 export const createOrder = async (req: Request, res: Response) => {
   const {
     userId,
-    products,
+    productIds,
     shippingAddress,
     paymentMethod,
-    itemsCharges,
+    itemCharges,
     shippingCharges,
     taxCharges,
     otherCharges,
   } = req.body;
-  const order = await prisma.order.create({
-    data: {
-      userId,
-      shippingAddress,
-      paymentMethod,
-      itemsCharges,
-      shippingCharges,
-      taxCharges,
-      otherCharges,
-      productIds: products,
-    },
-    select: {
-      id: true,
-      productIds: true,
-      itemsCharges: true,
-      otherCharges: true,
-      paymentMethod: true,
-      shippingAddress: true,
-      shippingCharges: true,
-      status: true,
-      taxCharges: true,
-      updatedAt: true,
-    },
+  const order = await OrderModel.create({
+    user: userId,
+    shippingAddress,
+    paymentMethod,
+    itemCharges,
+    shippingCharges,
+    taxCharges,
+    otherCharges,
+    products: productIds,
   });
 
   return res.status(201).json({
