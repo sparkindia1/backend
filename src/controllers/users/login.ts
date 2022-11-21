@@ -9,7 +9,7 @@ import AppError, { STATUS_CODES } from '../../utils/errors';
 export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
-  const user = await UserModel.findOne({ email });
+  const user = await UserModel.findOne({ email }).lean();
   if (!user) throw new AppError('User not found', STATUS_CODES.NOT_FOUND);
 
   const match = await bcrypt.compare(password, user.password);

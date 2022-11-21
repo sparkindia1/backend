@@ -1,4 +1,4 @@
-const fieldsNotToSend = ['password', 'deleted'];
+const fieldsNotToSend = ['password', 'isDeleted'];
 
 function filter<T>(obj: T) {
   const res: Partial<T> = {};

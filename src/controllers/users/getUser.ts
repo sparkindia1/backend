@@ -4,7 +4,7 @@ import filterResponse from '../../utils/filterResponse';
 
 export const getUser = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const user = await UserModel.findById(id);
+  const user = await UserModel.findById(id).lean();
 
   return res.status(200).json({
     user: filterResponse(user),

@@ -19,7 +19,7 @@ import {
 
 const userRouter = Router();
 
-userRouter.post('/user', validateGetuser, makeSafe(getUser));
+userRouter.post('/', validateGetuser, makeSafe(getUser));
 userRouter.post('/login', validateLogin, makeSafe(login));
 userRouter.post(
   '/register/create-account',
